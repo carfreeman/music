@@ -11,7 +11,6 @@ export const useModalStore = defineStore("modal", () => {
     //accions
     function toggleAuthModal() {
         isOpen.value = !isOpen.value
-        console.log(isOpen.value)
     }
 
     return { isOpen, hiddenClass, toggleAuthModal }

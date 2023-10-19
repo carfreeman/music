@@ -1,11 +1,15 @@
 <script setup>
     import { ref } from 'vue'
+    
+    import { useUserStore } from '@/stores/user'
 
+    const userStore = useUserStore()
+    
     const schema = {
         name: 'required|min:3|max:100|alpha_spaces',
         email: 'required|min:3|max:100|email',
         age: 'required|min_value:18|max_value:100',
-        password: 'required|min:3|max:30',
+        password: 'required|min:6|max:30',
         confirm_password: 'password_mismatch:@password',
         country: 'required|country_excluded:Vietnam',
         tos: 'tos',
@@ -16,16 +20,26 @@
     const reg_alert_variant = ref('')
     const reg_alert_msg = ref('')
 
-    function register(values) {
+    async function register(values) {
         reg_show_alert.value = true
         reg_in_submission.value = true
         reg_alert_variant.value = "bg-blue-500"
         reg_alert_msg.value = "Please wait, your account is being created."
 
+        try {
+            await userStore.register(values)
+        } catch (error) {
+            /* const errorCode = error.code;
+            const errorMessage = error.message; */
+            reg_in_submission.value = false
+            reg_alert_variant.value = 'bg-red-500'
+            reg_alert_msg.value = 'An unexpected error ocurred. Please try again later.'    
+            
+            return
+        }
+
         reg_alert_variant.value = "bg-green-500"
         reg_alert_msg.value = "Success, your account has been created."
-
-        console.log(values)
     }
 
     const userData = {

@@ -1,8 +1,7 @@
 <script setup>
   import { useModalStore } from '../stores/modal';
 
-  const modal = useModalStore()
-
+  const modalStore = useModalStore()
 </script>
 
 <template>
@@ -21,7 +20,7 @@
             <a 
               href="#" 
               class="px-2 text-white"
-              @click.prevent="modal.toggleAuthModal()"
+              @click.prevent="modalStore.toggleAuthModal()"
             >
               Login / Register
             </a>
