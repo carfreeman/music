@@ -6,7 +6,9 @@ import {
     updateProfile,
     usersCollection,
     doc,
-    setDoc, } from '@/includes/firebase'
+    setDoc,
+    signInWithEmailAndPassword,
+    signOut   } from '@/includes/firebase'
 
 export const useUserStore = defineStore("user", () => {
     //state
@@ -36,5 +38,15 @@ export const useUserStore = defineStore("user", () => {
         userLoggedIn.value = true
     }
 
-    return { userLoggedIn, register }
+    async function authenticate(values) {
+        await signInWithEmailAndPassword(auth, values.email, values.password)
+        userLoggedIn.value = true
+    }
+
+    async function signOutUser() {
+        await signOut(auth)
+        userLoggedIn.value = false
+    }
+
+    return { userLoggedIn, register, authenticate, signOutUser }
 })

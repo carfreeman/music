@@ -12,6 +12,8 @@ import { auth, onAuthStateChanged } from './includes/firebase'
 let app
 //Se llama a este observador cada vez que cambia 
 //el estado de acceso del usuario.
+//Verificar si el usuario este autenticado
+//cuando se inicia la aplicacion
 onAuthStateChanged(auth, () => {
     if (!app) {
         app = createApp(App)

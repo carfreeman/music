@@ -33,13 +33,13 @@
             const errorMessage = error.message; */
             reg_in_submission.value = false
             reg_alert_variant.value = 'bg-red-500'
-            reg_alert_msg.value = 'An unexpected error ocurred. Please try again later.'    
-            
+            reg_alert_msg.value = 'An unexpected error ocurred. Please try again later.'
             return
         }
 
         reg_alert_variant.value = "bg-green-500"
         reg_alert_msg.value = "Success, your account has been created."
+        window.location.reload()
     }
 
     const userData = {

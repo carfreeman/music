@@ -3,7 +3,9 @@ import {
   getAuth, 
   createUserWithEmailAndPassword,
   onAuthStateChanged,
-  updateProfile } from "firebase/auth"
+  updateProfile,
+  signInWithEmailAndPassword,
+  signOut,  } from "firebase/auth"
 import { 
   getFirestore, 
   collection, 
@@ -38,4 +40,6 @@ export {
     usersCollection,
     doc,
     setDoc,
+    signInWithEmailAndPassword,
+    signOut,
 }
