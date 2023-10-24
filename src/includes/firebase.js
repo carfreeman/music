@@ -6,12 +6,18 @@ import {
   updateProfile,
   signInWithEmailAndPassword,
   signOut,  } from "firebase/auth"
+
 import { 
   getFirestore, 
   collection, 
   //addDoc,
   doc,
   setDoc } from "firebase/firestore"
+  
+  import { 
+    getStorage,
+    ref as refFirebase,
+    uploadBytesResumable, } from "firebase/storage"
 
 const firebaseConfig = {
     apiKey: "AIzaSyBoTFLAN1XbRC-dp3y-SQnftTgofpB5sqo",
@@ -28,6 +34,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app)
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app)
+// Initialize Cloud Storage and get a reference to the service
+const storage = getStorage(app);
 
 const usersCollection = collection(db, 'users')
 
@@ -42,4 +50,7 @@ export {
     setDoc,
     signInWithEmailAndPassword,
     signOut,
+    storage,
+    refFirebase,
+    uploadBytesResumable,
 }
