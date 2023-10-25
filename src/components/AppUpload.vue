@@ -7,10 +7,17 @@
         auth,
         getDownloadURL,
         songsCollection,
-        addDoc, } from '@/includes/firebase'
+        addDoc,
+        getDoc, } from '@/includes/firebase'
 
     const is_dragover = ref(false)
     const uploads = ref([])
+    const props = defineProps({
+        addSong: {
+            type: Function,
+            required: true,
+        }
+    })
 
     function upload($event) {
         is_dragover.value = false
@@ -65,7 +72,12 @@
                     
                     song.url = await getDownloadURL(uploadTask.snapshot.ref)
                     // Add a document with a generated ID.
-                    await addDoc(songsCollection, song)
+                    const songRef = await addDoc(songsCollection, song)
+                    //Obtener el documento registrado
+                    const songSnapshot = await getDoc(songRef)
+
+                    //Cargar la cancion en ManageView
+                    props.addSong(songSnapshot)
 
                     uploads.value[uploadIndex].variant = 'bg-green-400'
                     uploads.value[uploadIndex].icon = 'fas fa-check'

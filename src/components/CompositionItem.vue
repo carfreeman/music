@@ -1,9 +1,13 @@
 <script setup>
-    import { defineProps, ref } from 'vue'
+    import { ref } from 'vue'
     import { 
         songsCollection,
         doc, 
-        updateDoc,  } from '@/includes/firebase'
+        updateDoc,
+        storage,
+        deleteObject,
+        deleteDoc,
+        refFirebase,  } from '@/includes/firebase'
 
     const props = defineProps({
         song: {
@@ -17,6 +21,13 @@
         index: {
             type: Number,
             required: true,
+        },
+        removeSong: {
+            type: Function,
+            required: true,
+        },
+        updateUnSavedFlag: {
+            type: Function,
         },
     })
 
@@ -52,10 +63,24 @@
 
         //success
         props.updateSong(props.index, values)
+        props.updateUnSavedFlag(false)
         
         is_submission.value = false
         alert_variant.value = 'bg-green-500'
         alert_message.value = 'Success!'
+    }
+
+    async function deleteSong() {
+        // Create a reference to the file to delete
+        const songRef = refFirebase(storage, `songs/${props.song.original_name}`)
+
+        // Delete the file
+        await deleteObject(songRef)
+
+        //Delete the document
+        await deleteDoc(doc(songsCollection, props.song.docId));
+
+        props.removeSong(props.index)
     }
 </script>
 
@@ -63,7 +88,9 @@
     <div class="border border-gray-200 p-3 mb-4 rounded">
         <div v-show="!showForm">
             <h4 class="inline-block text-2x1 font-bold">{{ song.modified_name }}</h4>
-            <button class="ml-1 py-1 px-2 text-sm rounded text-white bg-red-600 float-right">
+            <button 
+                class="ml-1 py-1 px-2 text-sm rounded text-white bg-red-600 float-right"
+                @click.prevent="deleteSong">
                 <i class="fa fa-times"></i>
             </button>
             <button 
@@ -91,6 +118,7 @@
                         name="modified_name"
                         class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                         placeholder="Enter song title"
+                        @input="props.updateUnSavedFlag(true)"
                     />
                     <ErrorMessage class="text-red-600" name="modified_name" />
                 </div>
@@ -101,6 +129,7 @@
                         name="genre"
                         class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                         placeholder="Enter genre"
+                        @input="props.updateUnSavedFlag(true)"
                     />
                     <ErrorMessage class="text-red-600" name="genre" />
                 </div>

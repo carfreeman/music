@@ -16,13 +16,16 @@ import {
   query,
   where,
   getDocs,
-  updateDoc,  } from "firebase/firestore"
+  getDoc,
+  updateDoc,
+  deleteDoc,  } from "firebase/firestore"
   
   import { 
     getStorage,
     ref as refFirebase,
     uploadBytesResumable,
-    getDownloadURL, } from "firebase/storage"
+    getDownloadURL,
+    deleteObject, } from "firebase/storage"
 
 const firebaseConfig = {
     apiKey: "AIzaSyBoTFLAN1XbRC-dp3y-SQnftTgofpB5sqo",
@@ -64,6 +67,9 @@ export {
     getDownloadURL,
     query,
     where,
+    getDoc,
     getDocs,
     updateDoc,
+    deleteObject,
+    deleteDoc,
 }

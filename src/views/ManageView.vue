@@ -8,29 +8,51 @@
         where, 
         getDocs, 
         auth, } from '@/includes/firebase'
+    import { onBeforeRouteLeave } from 'vue-router';
 
     const songs = ref([])
+    const unSavedFlag = ref(false)
 
     async function loadSongs() {
         const q = query(songsCollection, where('uid', '==', auth.currentUser.uid ))
         const querySnapshot = await getDocs(q)
         
-        querySnapshot.forEach((doc) => {
-            const song = {
-                ...doc.data(),
-                docId: doc.id,
-            }
-
-            songs.value.push(song)
-        })
+        querySnapshot.forEach(addSong)
     }
 
     loadSongs()
 
+    //funcion que uasara el componente CompositionItem
     function updateSong(index, values) {
         songs.value[index].modified_name = values.modified_name
         songs.value[index].genre = values.genre
     }
+    //funcion que usara el componente CompositionItem
+    function removeSong(i) {
+        songs.value.splice(i, 1)
+    }
+    //funcion que usara el componente AppUpload
+    function addSong(document) {
+        const song = {
+                ...document.data(),
+                docId: document.id,
+            }
+
+            songs.value.push(song)
+    }
+    //funcion que usara el componente CompositionItem
+    function updateUnSavedFlag(value) {
+        unSavedFlag.value = value
+    }
+
+     
+     onBeforeRouteLeave((to, from, next) => {
+        if (!unSavedFlag.value) {
+            next()
+        } else {
+            next(confirm('You have unsaved changes. Are you sure to want to leave?'))
+        }
+    })
 </script>
 
 <template>
@@ -38,7 +60,7 @@
     <section class="container mx-auto mt-6">
         <div class="md:grid md:grid-cols-3 md:gap-4">
             <div class="col-span-1">
-                <AppUpload />
+                <AppUpload :addSong="addSong"/>
             </div>
             <div class="col-span-2">
                 <div class="bg-white rounded border border-gray-200 relative flex flex-col">
@@ -54,6 +76,8 @@
                             :song="song"
                             :updateSong="updateSong"
                             :index="i"
+                            :removeSong="removeSong"
+                            :updateUnSavedFlag="updateUnSavedFlag"
                         /> 
                     </div>
                 </div>
