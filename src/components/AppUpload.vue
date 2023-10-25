@@ -1,13 +1,23 @@
 <script setup>
-    import { ref } from 'vue'
-    import { storage, refFirebase, uploadBytesResumable  } from '@/includes/firebase'
+    import { ref, onBeforeUnmount } from 'vue'
+    import { 
+        storage, 
+        refFirebase, 
+        uploadBytesResumable,
+        auth,
+        getDownloadURL,
+        songsCollection,
+        addDoc, } from '@/includes/firebase'
 
     const is_dragover = ref(false)
     const uploads = ref([])
 
     function upload($event) {
         is_dragover.value = false
-        const files = [ ...$event.dataTransfer.files ]
+        
+        const files = $event.dataTransfer 
+            ? [ ...$event.dataTransfer.files ]
+            : [ ...$event.target.files ]
 
         files.forEach((file) => {
             if (file.type !== 'audio/mpeg') {
@@ -24,7 +34,10 @@
             const uploadIndex = uploads.value.push({
                 uploadTask,
                 current_progress: 0,
-                name: file.name
+                name: file.name,
+                variant: 'bg-blue-400',
+                icon: 'fas fa-spinner fa-spin',
+                text_class: '',
             }) - 1
 
             uploadTask.on('state_changed', 
@@ -33,12 +46,39 @@
                     uploads.value[uploadIndex].current_progress = progress
                 }, 
                 (error) => {
-                    console.log('Ups: ' + error)
+                    uploads.value[uploadIndex].variant = 'bg-red-400'
+                    uploads.value[uploadIndex].icon = 'fas fa-times'
+                    uploads.value[uploadIndex].text_class = 'text-red-400'
+                    console.log(error)
+                },
+                //success
+                async () => {
+                    //datos para almacenar
+                    const song = {
+                        uid: auth.currentUser.uid,
+                        display_name: auth.currentUser.displayName,
+                        original_name: uploadTask.snapshot.ref.name,
+                        modified_name: uploadTask.snapshot.ref.name,
+                        genre: '',
+                        commet_count: 0,
+                    }
+                    
+                    song.url = await getDownloadURL(uploadTask.snapshot.ref)
+                    // Add a document with a generated ID.
+                    await addDoc(songsCollection, song)
+
+                    uploads.value[uploadIndex].variant = 'bg-green-400'
+                    uploads.value[uploadIndex].icon = 'fas fa-check'
+                    uploads.value[uploadIndex].text_class = 'text-green-400'
                 })
         })
-
-        console.log(files)
     }
+    //cancelar la carga de archivos si salimos del componente
+    onBeforeUnmount(() => {
+        uploads.value.forEach((upload) => {
+            upload.uploadTask.cancel()
+        })
+    })
 </script>
 
 <template>
@@ -61,17 +101,21 @@
                 @drop.prevent.stop="upload($event)">
                 <h5>Drop you files here</h5>
             </div>
+            <input type="file" multiple @change="upload($event)"/>
             <hr class="my-6" />
             <!-- progress bar -->
             <div 
                 class="mb-4"
                 v-for="upload in uploads" :key="upload.name">
                 <!-- file name -->
-                <div class="font-bold text-sm">{{ upload.name }}</div>
+                <div class="font-bold text-sm" :class="upload.text_class">
+                    <i :class="upload.icon"></i>&nbsp;{{ upload.name }}
+                </div>
                 <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
                     <!-- inner progress bar -->
                     <div 
-                        class="transition-all progress-bar bg-blue-400"
+                        class="transition-all progress-bar"
+                        :class="upload.variant"
                         :style="{ width: upload.current_progress + '%' }">
                     </div>
                 </div>

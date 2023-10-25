@@ -1,5 +1,36 @@
 <script setup>
     import AppUpload from '@/components/AppUpload.vue'
+    import CompositionItem from '@/components/CompositionItem.vue'
+    import { ref } from 'vue'
+    import { 
+        songsCollection, 
+        query, 
+        where, 
+        getDocs, 
+        auth, } from '@/includes/firebase'
+
+    const songs = ref([])
+
+    async function loadSongs() {
+        const q = query(songsCollection, where('uid', '==', auth.currentUser.uid ))
+        const querySnapshot = await getDocs(q)
+        
+        querySnapshot.forEach((doc) => {
+            const song = {
+                ...doc.data(),
+                docId: doc.id,
+            }
+
+            songs.value.push(song)
+        })
+    }
+
+    loadSongs()
+
+    function updateSong(index, values) {
+        songs.value[index].modified_name = values.modified_name
+        songs.value[index].genre = values.genre
+    }
 </script>
 
 <template>
@@ -17,83 +48,13 @@
                     </div>
                     <div class="p-6">
                         <!-- composition items -->
-                        <div class="border border-gray-200 p-3 mb-4 rounded">
-                            <div>
-                                <h4 class="inline-block text-2x1 font-bold">Song name</h4>
-                                <button class="ml-1 py-1 px-2 text-sm rounded text-white bg-red-600 float-right">
-                                    <i class="fa fa-times"></i>
-                                </button>
-                                <button class="ml-1 py-1 px-2 text-sm rounded text-white bg-blue-600 float-right">
-                                    <i class="fa fa-pencil-alt"></i>
-                                </button>
-                            </div>
-                            <div>
-                                <form action="#">
-                                    <div class="mb-3">
-                                        <label for="" class="inline-block mb-2">Song title</label>
-                                        <input 
-                                            type="text" 
-                                            class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
-                                            placeholder="Enter song title"
-                                        />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="" class="inline-block mb-2">Genre</label>
-                                        <input 
-                                            type="text"
-                                            class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
-                                            placeholder="Enter genre"
-                                        />
-                                    </div>
-                                    <button type="submit" class="py-1.5 px-3 rounded text-white bg-green-600"> Submit </button>
-                                    <button type="button" class="py-1.5 px-3 rounded text-white bg-gray-600">Go back</button>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="border border-gray-200 p-3 mb-4 rounded">
-                            <div>
-                                <h4 class="inline-block text-2x1 font-bold">Song name</h4>
-                                <button class="ml-1 py-1 px-2 text-sm rounded text-white bg-red-600 float-right">
-                                    <i class="fa fa-times"></i>
-                                </button>
-                                <button class="ml-1 py-1 px-2 text-sm rounded text-white bg-blue-600 float-right">
-                                    <i class="fa fa-pencil-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="border border-gray-200 p-3 mb-4 rounded">
-                            <div>
-                                <h4 class="inline-block text-2x1 font-bold">Song name</h4>
-                                <button class="ml-1 py-1 px-2 text-sm rounded text-white bg-red-600 float-right">
-                                    <i class="fa fa-times"></i>
-                                </button>
-                                <button class="ml-1 py-1 px-2 text-sm rounded text-white bg-blue-600 float-right">
-                                    <i class="fa fa-pencil-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="border border-gray-200 p-3 mb-4 rounded">
-                            <div>
-                                <h4 class="inline-block text-2x1 font-bold">Song name</h4>
-                                <button class="ml-1 py-1 px-2 text-sm rounded text-white bg-red-600 float-right">
-                                    <i class="fa fa-times"></i>
-                                </button>
-                                <button class="ml-1 py-1 px-2 text-sm rounded text-white bg-blue-600 float-right">
-                                    <i class="fa fa-pencil-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="border border-gray-200 p-3 mb-4 rounded">
-                            <div>
-                                <h4 class="inline-block text-2x1 font-bold">Song name</h4>
-                                <button class="ml-1 py-1 px-2 text-sm rounded text-white bg-red-600 float-right">
-                                    <i class="fa fa-times"></i>
-                                </button>
-                                <button class="ml-1 py-1 px-2 text-sm rounded text-white bg-blue-600 float-right">
-                                    <i class="fa fa-pencil-alt"></i>
-                                </button>
-                            </div>
-                        </div>
+                        <CompositionItem 
+                            v-for="(song, i) in songs" 
+                            :key="song.docId"
+                            :song="song"
+                            :updateSong="updateSong"
+                            :index="i"
+                        /> 
                     </div>
                 </div>
             </div>
