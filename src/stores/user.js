@@ -6,6 +6,7 @@ import {
     updateProfile,
     usersCollection,
     doc,
+    getDoc,
     setDoc,
     signInWithEmailAndPassword,
     signOut   } from '@/includes/firebase'
@@ -39,7 +40,22 @@ export const useUserStore = defineStore("user", () => {
     }
 
     async function authenticate(values) {
-        await signInWithEmailAndPassword(auth, values.email, values.password)
+        const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password)
+        //actualizar el perfil del usuario
+        const uid = userCredential.user.uid
+        const docRef = doc(usersCollection, uid)
+        const docSnap = await getDoc(docRef)
+
+        if (docSnap.exists()) {
+            const dataUser = docSnap.data()
+            
+            await updateProfile(auth.currentUser, {
+                displayName: dataUser.name,
+            })
+        } else {
+            console.log('No such document')
+        }
+
         userLoggedIn.value = true
     }
 

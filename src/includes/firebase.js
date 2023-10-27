@@ -18,7 +18,10 @@ import {
   getDocs,
   getDoc,
   updateDoc,
-  deleteDoc,  } from "firebase/firestore"
+  deleteDoc,
+  orderBy, 
+  startAfter, 
+  limit,  } from "firebase/firestore"
   
   import { 
     getStorage,
@@ -48,6 +51,43 @@ const storage = getStorage(app);
 const usersCollection = collection(db, 'users')
 const songsCollection = collection(db, 'songs')
 
+/* const authService = {
+  getAuth, 
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  updateProfile,
+  signInWithEmailAndPassword,
+  signOut,
+}
+
+const firestoreService = {
+  getFirestore, 
+  collection, 
+  addDoc,
+  doc,
+  setDoc,
+  query,
+  where,
+  getDocs,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+}
+
+const storageService = {
+  getStorage,
+  refFirebase,
+  uploadBytesResumable,
+  getDownloadURL,
+  deleteObject,
+} */
+
+/* export {
+  authService,
+  firestoreService,
+  storageService,
+} */
+
 export {
     app,
     auth,
@@ -72,4 +112,7 @@ export {
     updateDoc,
     deleteObject,
     deleteDoc,
+    orderBy, 
+    startAfter, 
+    limit,
 }

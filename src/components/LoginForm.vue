@@ -28,6 +28,7 @@
             login_alert_msg.value = 'Invalid login details.'
             return
         }
+
         login_alert_variant.value = 'bg-green-500'
         login_alert_msg.value = 'Success! You are now logged in.'
         window.location.reload()
