@@ -26,6 +26,11 @@ const routes = [
     }
   },
   {
+    path: '/song/:id',
+    name: 'song',
+    component: () => import('@/views/SongView.vue'),
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     //component: () => import('@/views/NotFound.vue'),

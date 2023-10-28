@@ -50,43 +50,7 @@ const storage = getStorage(app);
 
 const usersCollection = collection(db, 'users')
 const songsCollection = collection(db, 'songs')
-
-/* const authService = {
-  getAuth, 
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  updateProfile,
-  signInWithEmailAndPassword,
-  signOut,
-}
-
-const firestoreService = {
-  getFirestore, 
-  collection, 
-  addDoc,
-  doc,
-  setDoc,
-  query,
-  where,
-  getDocs,
-  getDoc,
-  updateDoc,
-  deleteDoc,
-}
-
-const storageService = {
-  getStorage,
-  refFirebase,
-  uploadBytesResumable,
-  getDownloadURL,
-  deleteObject,
-} */
-
-/* export {
-  authService,
-  firestoreService,
-  storageService,
-} */
+const commentsCollection = collection(db, 'comments')
 
 export {
     app,
@@ -115,4 +79,5 @@ export {
     orderBy, 
     startAfter, 
     limit,
+    commentsCollection,
 }
