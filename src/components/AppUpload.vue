@@ -67,7 +67,7 @@
                         original_name: uploadTask.snapshot.ref.name,
                         modified_name: uploadTask.snapshot.ref.name,
                         genre: '',
-                        commet_count: 0,
+                        comment_count: 0,
                     }
                     
                     song.url = await getDownloadURL(uploadTask.snapshot.ref)

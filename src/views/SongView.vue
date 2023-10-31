@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, computed } from 'vue'
+    import { ref, computed, watch } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
     import { 
         songsCollection,
@@ -10,10 +10,13 @@
         addDoc,
         query,
         where,
-        getDocs, } from '@/includes/firebase'
+        getDocs,
+        updateDoc, } from '@/includes/firebase'
     import { useUserStore } from '@/stores/user'
+    import { usePlayerStore } from '@/stores/player'
 
     const userStore = useUserStore()
+    const playerStore = usePlayerStore()
     const route = useRoute()
     const router = useRouter()
     const song = ref({})
@@ -27,6 +30,23 @@
     const comment_alert_variant = ref('')
     const comment_alert_message = ref('')
 
+    async function getSong() {
+        const docSnap = await getDoc(doc(songsCollection, route.params.id))
+
+        if (!docSnap.exists()) {
+            router.push({ name: 'home' })
+            return
+        }
+        //verificar si hay un parametro de consulta
+        let { sort } = route.query
+        sort = sort === '1' || sort === '2' ? sort : '1'
+
+        song.value = docSnap.data()
+        getComments()
+    }
+
+    getSong()
+
     const sortedComments = computed(() => {
         return comments.value.slice().sort((a, b) => {
             if (sort.value === '1') {
@@ -36,20 +56,6 @@
             return new Date(a.datePosted) - new Date(b.datePosted)
         })
     })
-
-    async function getSong() {
-        const docSnap = await getDoc(doc(songsCollection, route.params.id))
-
-        if (!docSnap.exists()) {
-            router.push({ name: 'home' })
-            return
-        }
-
-        song.value = docSnap.data()
-        getComments()
-    }
-
-    getSong()
 
     async function addComment(values, { resetForm }) {
         comment_in_submission.value = true
@@ -64,8 +70,15 @@
             name: auth.currentUser.displayName,
             uid: auth.currentUser.uid,
         }
-
+        //agregando el documento en firestore database
         await addDoc(commentsCollection, comment)
+        //actualizando el conteo de comentarios de la musica en vue
+        song.value.comment_count += 1
+        //actualizando el conteo de comentarios de la musica en firestore database
+        await updateDoc(doc(songsCollection, route.params.id), {
+            comment_count: song.value.comment_count
+        })
+        
         getComments() //cargar los comentarios
 
         comment_in_submission.value = false
@@ -91,6 +104,17 @@
             })
         })
     }
+
+    watch(sort, (newVal) => {
+        if (newVal === route.query.sort) {
+            return
+        }
+        router.push({
+            query: {
+                sort: newVal
+            }
+        })
+    })
 </script>
 
 <template>
@@ -100,7 +124,11 @@
         </div>
         <div class="container mx-auto flex items-center">
             <!-- play/pause button -->
-            <button type="button" class="z-50 h-24 w-24 text-3xl bg-white text-black rounded-full focus:outline-none">
+            <button 
+                type="button" 
+                class="z-50 h-24 w-24 text-3xl bg-white text-black rounded-full focus:outline-none"
+                @click.prevent="playerStore.newSong(song)"
+            >
                 <i class="fas fa-play"></i>
             </button>
             <div class="z-50 text-left ml-8">
@@ -115,7 +143,7 @@
         <div class="bg-white rounded border border-gray-200 realtive flex flex-col">
             <div class="px-6 pt-6 pb-5 font-bold border-b border-gray-200">
                 <!-- comment count -->
-                <span class="card-title">Comments (15)</span>
+                <span class="card-title">Comments ({{ song.comment_count }})</span>
                 <i class="fa fa-comments float-right text-green-400 text-2xl"></i>
             </div>
             <div class="p-6">
