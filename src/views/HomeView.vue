@@ -70,40 +70,42 @@
 </script>
 
 <template>
+  <main>
     <!-- introduction -->
-  <section class="mb-8 py-20 text-white text-center relative">
-    <div class="absolute inset-0 w-full bg-contain introduction-bg" style="background-image: url(assets/img/header.png);"></div>
-    <div class="container mx-auto">
-      <div class="text-white main-header-content">
-        <h1 class="font-bold text-5xl mb-5">
-          Listen to great music!
-        </h1>
-        <p class="w-full md:w-8/12 mx-auto">
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. 
-          In nam eius asperiores quia ipsa eveniet at, neque
-          culpa et ex error voluptatem. Incidunt hic 
-          tempora modi quis? Porro, iste adipisci.
-        </p>
+    <section class="mb-8 py-20 text-white text-center relative">
+      <div class="absolute inset-0 w-full bg-contain introduction-bg" style="background-image: url(assets/img/header.png);"></div>
+      <div class="container mx-auto">
+        <div class="text-white main-header-content">
+          <h1 class="font-bold text-5xl mb-5">
+            Listen to great music!
+          </h1>
+          <p class="w-full md:w-8/12 mx-auto">
+            Lorem ipsum, dolor sit amet consectetur adipisicing elit. 
+            In nam eius asperiores quia ipsa eveniet at, neque
+            culpa et ex error voluptatem. Incidunt hic 
+            tempora modi quis? Porro, iste adipisci.
+          </p>
+        </div>
       </div>
-    </div>
-    <img src="/assets/img/introduction-music.png" class="relative block mx-auto mt-5 -mb-20 w-auto max-w-full" />
-  </section>
-  <!-- main content -->
-  <section class="container mx-auto">
-    <div class="bg-white rounded border border-gray-200 relative flex flex-col">
-      <div class="px-6 pt-6 pb-5 font-bold border-b border-gray-200">
-        <span class="card-title">Songs</span>
-        <!-- icon -->
-        <i class="fa fa-headphones-alt float-right text-green-400 text-xl"></i>
+      <img src="/assets/img/introduction-music.png" class="relative block mx-auto mt-5 -mb-20 w-auto max-w-full" />
+    </section>
+    <!-- main content -->
+    <section class="container mx-auto">
+      <div class="bg-white rounded border border-gray-200 relative flex flex-col">
+        <div class="px-6 pt-6 pb-5 font-bold border-b border-gray-200">
+          <span class="card-title">Songs</span>
+          <!-- icon -->
+          <i class="fa fa-headphones-alt float-right text-green-400 text-xl"></i>
+        </div>
+        <!-- playlist -->
+        <ol id="playlist">
+          <SongItem 
+            v-for="song in songs"
+            :key="song.docId"
+            :song="song"/>
+        </ol>
+        <!-- end playlist -->
       </div>
-      <!-- playlist -->
-      <ol id="playlist">
-        <SongItem 
-          v-for="song in songs"
-          :key="song.docId"
-          :song="song"/>
-      </ol>
-      <!-- end playlist -->
-    </div>
-  </section>
+    </section>
+  </main>
 </template>
