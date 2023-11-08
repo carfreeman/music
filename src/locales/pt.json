@@ -1,0 +1,12 @@
+{
+    "home": {
+        "listen": "Ouça boa música!"
+    },
+    "song": {
+        "comment_count": "sem comentários | 1 comenta | { count } comentários"
+    },
+    "register": {
+        "accept_tos": "Termos de serviço",
+        "term": "Aceito {0}."
+    }
+}

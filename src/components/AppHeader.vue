@@ -2,17 +2,29 @@
   import { useModalStore } from '@/stores/modal'
   import { useUserStore } from '@/stores/user'
   import { RouterLink, useRouter, useRoute } from 'vue-router'
+  import { computed } from 'vue'
+import { useI18n } from 'vue-i18n';
 
   const modalStore = useModalStore()
   const userStore = useUserStore()
   const router = useRouter()
   const route = useRoute()
 
+  const { locale } = useI18n({ useScope: 'global' })
+
+  const currentLocale = computed(() => {
+    return locale.value === "pt" ? "Portugues" : "English"
+  })
+
   function signOut() {
     userStore.signOutUser()
     if (route.meta.requiresAuth) {
       router.push({ name: 'home' })
     }
+  }
+
+  function changeLocale() {
+    locale.value = locale.value === "pt" ? "en" : "pt"
   }
 </script>
 
@@ -27,7 +39,7 @@
         exact-active-class="no-active">
         Music
       </RouterLink>
-      <div class="flex flex-group items-center">
+      <div class="flex flex-grow items-center">
         <!-- primary navigation -->
         <ul class="flex flex-row mt-1">
           <!-- navigation links -->
@@ -54,6 +66,17 @@
                 @click.prevent="signOut">Logout</a>
             </li>
           </template>
+        </ul>
+        <ul class="ml-auto">
+          <li>
+            <a 
+              href="#" 
+              class="px-2 text-white"
+              @click.prevent="changeLocale"
+            >
+              {{ currentLocale }}
+            </a>
+          </li>
         </ul>
       </div>
     </nav>

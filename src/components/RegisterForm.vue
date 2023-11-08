@@ -136,8 +136,12 @@
                 type="checkbox"
                 name="tos"
                 value="1" 
-                class="w-4 h-4 float-left -ml-6 mt-1 rounded inline-block" />
-            <label class="inline-block">Accept terms of service</label>
+                class="w-4 h-4 float-left -ml-6 mt-1 rounded inline-block" 
+            />
+            <!-- <label class="inline-block">Accept terms of service</label> -->
+            <i18n-t keypath="register.term" tag="label" for="">
+                <a href="#">{{ $t("register.accept_tos") }}</a>
+            </i18n-t>
             <ErrorMessage class="text-red-600 block" name="tos" />
         </div>
         <button 
