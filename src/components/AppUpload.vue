@@ -1,14 +1,6 @@
 <script setup>
     import { ref, onBeforeUnmount } from 'vue'
-    import { 
-        storage, 
-        refFirebase, 
-        uploadBytesResumable,
-        auth,
-        getDownloadURL,
-        songsCollection,
-        addDoc,
-        getDoc, } from '@/includes/firebase'
+    import { storage, auth, songsCollection, } from '@/includes/firebase'
 
     const is_dragover = ref(false)
     const uploads = ref([])
@@ -44,11 +36,10 @@
             }
 
             // Points to the root reference
-            const storageRef = refFirebase(storage) //"music-b7571.appspot.com"
-            // Points to 'images'
-            const songsRef = refFirebase(storageRef, `songs/${file.name}`) //"music-b7571.appspot.com/songs/music.mp3"
-            
-            const uploadTask = uploadBytesResumable(songsRef, file)
+            const storageRef = storage.ref() //"music-b7571.appspot.com"
+            // Points to 'songs'
+            const songsRef = storageRef.child(`songs/${file.name}`) //"music-b7571.appspot.com/songs/music.mp3"
+            const uploadTask = songsRef.put(file)
 
             const uploadIndex = uploads.value.push({
                 uploadTask,
@@ -82,11 +73,12 @@
                         comment_count: 0,
                     }
                     
-                    song.url = await getDownloadURL(uploadTask.snapshot.ref)
+                    song.url = await uploadTask.snapshot.ref.getDownloadURL()
+                    
                     // Add a document with a generated ID.
-                    const songRef = await addDoc(songsCollection, song)
+                    const songRef = await songsCollection.add(song)
                     //Obtener el documento registrado
-                    const songSnapshot = await getDoc(songRef)
+                    const songSnapshot = await songRef.get()
 
                     //Cargar la cancion en ManageView
                     props.addSong(songSnapshot)

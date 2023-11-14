@@ -2,22 +2,17 @@
     import AppUpload from '@/components/AppUpload.vue'
     import CompositionItem from '@/components/CompositionItem.vue'
     import { ref } from 'vue'
-    import { 
-        songsCollection, 
-        query, 
-        where, 
-        getDocs, 
-        auth, } from '@/includes/firebase'
-    import { onBeforeRouteLeave } from 'vue-router';
+    import { auth, songsCollection, } from '@/includes/firebase'
+    import { onBeforeRouteLeave } from 'vue-router'
 
     const songs = ref([])
     const unSavedFlag = ref(false)
 
     async function loadSongs() {
-        const q = query(songsCollection, where('uid', '==', auth.currentUser.uid ))
-        const querySnapshot = await getDocs(q)
-        
-        querySnapshot.forEach(addSong)
+        /* const q = query(songsCollection, where('uid', '==', auth.currentUser.uid ))
+        const querySnapshot = await getDocs(q) */
+        const snapshot = await songsCollection.where('uid', '==', auth.currentUser.uid).get()
+        snapshot.forEach(addSong)
     }
 
     loadSongs()

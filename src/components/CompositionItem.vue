@@ -1,13 +1,6 @@
 <script setup>
     import { ref } from 'vue'
-    import { 
-        songsCollection,
-        doc, 
-        updateDoc,
-        storage,
-        deleteObject,
-        deleteDoc,
-        refFirebase,  } from '@/includes/firebase'
+    import { songsCollection, storage, } from '@/includes/firebase'
 
     const props = defineProps({
         song: {
@@ -47,13 +40,8 @@
         alert_variant.value = 'bg-blue-500'
         alert_message.value = 'Please wait, Updating song info.'
         
-        const songRef = doc(songsCollection, props.song.docId)
-
         try {
-            await updateDoc(songRef, {
-                modified_name: values.modified_name,
-                genre: values.genre,
-            })   
+            await songsCollection.doc(props.song.docId).update(values)
         } catch (error) {
             is_submission.value = false
             alert_variant.value = 'bg-red-500'
@@ -71,14 +59,14 @@
     }
 
     async function deleteSong() {
-        // Create a reference to the file to delete
-        const songRef = refFirebase(storage, `songs/${props.song.original_name}`)
-
+        const storageRef = storage.ref()
+        const songRef = storageRef.child(`songs/${props.song.original_name}`)
+       
         // Delete the file
-        await deleteObject(songRef)
+        await songRef.delete()
 
         //Delete the document
-        await deleteDoc(doc(songsCollection, props.song.docId));
+        await songsCollection.doc(props.song.docId).delete()
 
         props.removeSong(props.index)
     }

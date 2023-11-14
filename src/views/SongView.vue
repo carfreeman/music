@@ -1,7 +1,8 @@
 <script setup>
     import { ref, computed, watch } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
-    import { 
+    import { auth, songsCollection, commentsCollection } from '@/includes/firebase'
+    /* import { 
         songsCollection,
         doc,
         getDoc,
@@ -11,7 +12,7 @@
         query,
         where,
         getDocs,
-        updateDoc, } from '@/includes/firebase'
+        updateDoc, } from '@/includes/firebase' */
     import { useUserStore } from '@/stores/user'
     import { usePlayerStore } from '@/stores/player'
 
@@ -31,9 +32,9 @@
     const comment_alert_message = ref('')
 
     async function getSong() {
-        const docSnap = await getDoc(doc(songsCollection, route.params.id))
+        const docSnap = await songsCollection.doc(route.params.id).get()
 
-        if (!docSnap.exists()) {
+        if (!docSnap.exists) {
             router.push({ name: 'home' })
             return
         }
@@ -72,11 +73,11 @@
             uid: auth.currentUser.uid,
         }
         //agregando el documento en firestore database
-        await addDoc(commentsCollection, comment)
+        await commentsCollection.add(comment)
         //actualizando el conteo de comentarios de la musica en vue
         song.value.comment_count += 1
         //actualizando el conteo de comentarios de la musica en firestore database
-        await updateDoc(doc(songsCollection, route.params.id), {
+        await songsCollection.doc(route.params.id).update({
             comment_count: song.value.comment_count
         })
         
@@ -90,14 +91,12 @@
     }
 
     async function getComments() {
-        //consulta de los comentarios
-        const q = query(commentsCollection, where('sid', '==', route.params.id))
-        const querySnapshot = await getDocs(q)
+        const snapshots = await commentsCollection.where('sid', '==', route.params.id).get()
 
         //vaciar los comentarios
         comments.value = []
 
-        querySnapshot.forEach((doc) => {
+        snapshots.forEach((doc) => {
             //agregar los comentarios
             comments.value.push({
                 docId: doc.id,

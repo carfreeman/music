@@ -1,15 +1,6 @@
 import { ref } from "vue"
 import { defineStore } from "pinia"
-import { 
-    auth,
-    createUserWithEmailAndPassword,
-    updateProfile,
-    usersCollection,
-    doc,
-    getDoc,
-    setDoc,
-    signInWithEmailAndPassword,
-    signOut   } from '@/includes/firebase'
+import { auth, usersCollection } from '@/includes/firebase'
 
 export const useUserStore = defineStore("user", () => {
     //state
@@ -19,20 +10,17 @@ export const useUserStore = defineStore("user", () => {
     async function register(values) {
         //registro de email y password en el servicio 
         //authentication de firebase
-        const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password)
+        const userCredential = await auth.createUserWithEmailAndPassword(values.email, values.password)
         //registro de los demas valores en el servicio
         //de cloud firestore
-        /* setDoc(referencia, datos) Escribe en el documento 
-        al que hace referencia este DocumentReference .
-        Si el documento aún no existe, se creará. */
-        await setDoc(doc(usersCollection, userCredential.user.uid), {
+        await usersCollection.doc(userCredential.user.uid).set({
             name: values.name,
             email: values.email,
             age: values.age,
-            country: values.country
+            country: values.country,
         })
 
-        await updateProfile(auth.currentUser, {
+        await userCredential.user.updateProfile({
             displayName: values.name,
         })
 
@@ -40,27 +28,26 @@ export const useUserStore = defineStore("user", () => {
     }
 
     async function authenticate(values) {
-        const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password)
+        const userCredential = await auth.signInWithEmailAndPassword(values.email, values.password)
+        userLoggedIn.value = true
         //actualizar el perfil del usuario
         const uid = userCredential.user.uid
-        const docRef = doc(usersCollection, uid)
-        const docSnap = await getDoc(docRef)
+        const docRef = usersCollection.doc(uid)
+        const docSnap = await docRef.get()
 
-        if (docSnap.exists()) {
+        if (docSnap.exists) {
             const dataUser = docSnap.data()
             
-            await updateProfile(auth.currentUser, {
+            await userCredential.user.updateProfile({
                 displayName: dataUser.name,
             })
         } else {
             console.log('No such document')
         }
-
-        userLoggedIn.value = true
     }
 
     async function signOutUser() {
-        await signOut(auth)
+        await auth.signOut()
         userLoggedIn.value = false
     }
 

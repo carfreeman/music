@@ -3,7 +3,7 @@
   import { useUserStore } from '@/stores/user'
   import { RouterLink, useRouter, useRoute } from 'vue-router'
   import { computed } from 'vue'
-import { useI18n } from 'vue-i18n';
+  import { useI18n } from 'vue-i18n';
 
   const modalStore = useModalStore()
   const userStore = useUserStore()

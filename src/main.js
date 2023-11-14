@@ -7,7 +7,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import VeeValidatePlugin from './includes/validation'
-import { auth, onAuthStateChanged } from './includes/firebase'
+import { auth } from './includes/firebase'
 import i18n from './includes/i18n'
 import { registerSW } from 'virtual:pwa-register'
 
@@ -18,7 +18,7 @@ let app
 //el estado de acceso del usuario.
 //Verificar si el usuario este autenticado
 //cuando se inicia la aplicacion
-onAuthStateChanged(auth, () => {
+auth.onAuthStateChanged(() => {
     if (!app) {
         app = createApp(App)
         const pinia = createPinia()

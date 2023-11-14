@@ -1,17 +1,7 @@
 <script setup>
 import { ref, onBeforeUnmount } from 'vue'
-import {
-  songsCollection,
-  //getDocs,
-  getDoc,
-  doc,
-  orderBy,
-  startAfter,
-  limit,
-  query,
-  onSnapshot
-} from '@/includes/firebase'
 import SongItem from '@/components/SongItem.vue'
+import { songsCollection } from '@/includes/firebase'
 
 const songs = ref([])
 let maxPerPage = 3
@@ -19,8 +9,6 @@ let pendingRequest = false
 
 //obtener las canciones de la coleccion songs
 async function loadSongs() {
-  //let snapshots
-  let q
   //si esta pendiente, no se solicita mas canciones
   if (pendingRequest) {
     return
@@ -28,18 +16,33 @@ async function loadSongs() {
 
   pendingRequest = true
 
+  let snapshots
+
   if (songs.value.length) {
     //si hay canciones, solicitamos a partir del ultimo registro
-    const lastDoc = await getDoc(doc(songsCollection, songs.value[songs.value.length - 1].docId))
-    q = query(songsCollection, orderBy('modified_name'), startAfter(lastDoc), limit(maxPerPage))
-    //snapshots = await getDocs(q)
+    const lastDoc = await songsCollection.doc(songs.value[songs.value.length - 1].docId).get()
+
+    snapshots = await songsCollection
+      .orderBy('modified_name')
+      .startAfter(lastDoc)
+      .limit(maxPerPage)
+      .get()
   } else {
     //si no hay canciones, solo solicitamos
-    q = query(songsCollection, orderBy('modified_name'), limit(3))
-    //snapshots = await getDocs(q)
+    snapshots = await songsCollection
+    .orderBy('modified_name')
+    .limit(maxPerPage)
+    .get()
   }
 
-  onSnapshot(q, { includeMetadataChanges: true }, (snapshot) => {
+  snapshots.forEach((document) => {
+    songs.value.push({
+      docId: document.id,
+      ...document.data()
+    })
+  })
+
+  /* onSnapshot(q, { includeMetadataChanges: true }, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
       if (change.type === 'added') {
         //console.log('New city: ', change.doc.data())
@@ -52,21 +55,18 @@ async function loadSongs() {
       const source = snapshot.metadata.fromCache ? 'local cache' : 'server'
       console.log('Data came from ' + source)
     })
-  })
-
-  /*  snapshots.forEach((document) => {
-    songs.value.push({
-      docId: document.id,
-      ...document.data()
-    })
   }) */
 
   pendingRequest = false
 }
+
+loadSongs()
+
 //antes de navegar a otra pagina, remover el scroll infinito
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', handleScroll)
 })
+
 //scroll infinito
 function handleScroll() {
   //scrollTop => distancia recorrida del documento
@@ -83,8 +83,6 @@ function handleScroll() {
 }
 //agregar el evento scroll infinito
 window.addEventListener('scroll', handleScroll)
-
-loadSongs()
 </script>
 
 <template>
