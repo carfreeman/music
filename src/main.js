@@ -1,5 +1,6 @@
 import './assets/base.css'
 import './assets/main.css'
+import 'nprogress/nprogress.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
@@ -10,8 +11,10 @@ import VeeValidatePlugin from './includes/validation'
 import { auth } from './includes/firebase'
 import i18n from './includes/i18n'
 import { registerSW } from 'virtual:pwa-register'
+import progressBar from './includes/progress-bar'
 
 registerSW({ immediate: true})
+progressBar(router)
 
 let app
 //Se llama a este observador cada vez que cambia 
